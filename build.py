@@ -87,10 +87,10 @@ def fill_module(arch: str, frida_tag: str, project_tag: str):
     extract_file(frida_server_path, files_dir.joinpath(f"frida-server-{arch}"))
 
 
-def package_module(project_tag: str):
+def package_module(version: str):
     logger.info("Packaging module")
 
-    module_zip = PATH_BUILD.joinpath(f"MagiskFrida-{project_tag}.zip")
+    module_zip = PATH_BUILD.joinpath(f"MagiskFrida-{version}.zip")
 
     with zipfile.ZipFile(module_zip, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for root, _, files in os.walk(PATH_BUILD_TMP):
@@ -109,7 +109,7 @@ def do_build(frida_tag: str, project_tag: str):
 
     create_module(project_tag)
 
-    archs = ["arm", "arm64", "x86", "x86_64"]
+    archs = [ "arm64", "x86_64"]
     executor = concurrent.futures.ProcessPoolExecutor()
     futures = [executor.submit(fill_module, arch, frida_tag, project_tag)
                for arch in archs]
@@ -119,6 +119,6 @@ def do_build(frida_tag: str, project_tag: str):
     # TODO: Causes 'OSError: The handle is invalid' in Python 3.7, revert after update
     # executor.shutdown()
 
-    package_module(project_tag)
+    package_module(frida_tag)
 
     logger.info("Done")
