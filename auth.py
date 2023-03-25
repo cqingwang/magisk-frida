@@ -1,4 +1,4 @@
 
 auth_headers={
-    'authorization': "token {0}".format('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'), # type classic name:pub_access
+    'authorization': "token {0}".format('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'), # type classic name:pub_access
 }
