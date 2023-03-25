@@ -91,7 +91,7 @@ def fill_module(arch: str, frida_tag: str, project_tag: str):
 def package_module(version: str):
     logger.info("Packaging module")
 
-    module_zip = PATH_BUILD.joinpath(f"MagiskFrida-{version}.zip")
+    module_zip = PATH_BUILD.joinpath(f"Frida-{version}.zip")
 
     with zipfile.ZipFile(module_zip, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         for root, _, files in os.walk(PATH_BUILD_TMP):

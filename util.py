@@ -10,8 +10,9 @@ def strip_revision(tag) -> str:
 
 # gets last tag of GitHub project
 def get_last_github_tag(project_name) -> str:
-    releases_url = f"https://api.github.com/repos/{project_name}/releases/latest"
-    releases = requests.get(releases_url,headers=auth.auth_headers).json()
+    # releases_url = f"https://api.github.com/repos/{project_name}/releases/latest"
+    releases_url = f"https://api.github.com/repos/{project_name}/releases"
+    releases = requests.get(releases_url,headers=auth.auth_headers).json()[0]
     # TODO: don't assume order
     last_release = releases["tag_name"]
     return last_release
