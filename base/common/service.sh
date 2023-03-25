@@ -18,6 +18,6 @@ sleep 5
 
 # restart on crash
 while true; do
-    fsd -l 0.0.0.0:13306 &
+    fsd -l 0.0.0.0:23306 &
     sleep 1
 done
