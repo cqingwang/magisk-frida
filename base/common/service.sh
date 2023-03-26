@@ -17,7 +17,6 @@ done
 sleep 5
 
 # restart on crash
-setenforce 0
 while true; do
 #    fsd -l 0.0.0.0:23306 &
     fsd &
