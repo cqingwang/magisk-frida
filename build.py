@@ -25,7 +25,7 @@ logger.setLevel(logging.INFO)
 logger.addHandler(syslog)
 
 
-def download_file(url: str, path: Path):
+def download_with_cache_file(url: str, path: Path):
     file_name = url[url.rfind("/") + 1:]
     logger.info(f"file:{file_name} ,path:'{url}'")
     logger.info(f"Downloading '{file_name}' to '{path}'")
@@ -53,7 +53,7 @@ def extract_file(archive_path: Path, dest_path: Path):
             out.write(file_content)
 
 
-def create_module_prop(path: Path, project_tag: str):
+def gen_module_prop_file(path: Path, project_tag: str):
     module_prop = f"""id=magisk-frida
 name=MagiskFrida
 version={project_tag}
@@ -65,17 +65,16 @@ description=Run frida-server on boot"""
         f.write(module_prop)
 
 
-def create_module(project_tag: str):
+def copy_template_to_build(project_tag: str):
     logger.info("Creating module")
 
     if PATH_BUILD_TMP.exists():
         shutil.rmtree(PATH_BUILD_TMP)
 
     shutil.copytree(PATH_BASE_MODULE, PATH_BUILD_TMP)
-    create_module_prop(PATH_BUILD_TMP, project_tag)
 
 
-def fill_module(arch: str, frida_tag: str, project_tag: str):
+def fill_so_module(arch: str, frida_tag: str):
     threading.current_thread().setName(arch)
     logger.info(f"Filling module for arch '{arch}'")
 
@@ -83,7 +82,7 @@ def fill_module(arch: str, frida_tag: str, project_tag: str):
     frida_server = f"hluda-server-{frida_tag}-android-{arch}.xz"
     frida_server_path = PATH_DOWNLOADS.joinpath(frida_server)
 
-    download_file(frida_download_url + frida_server, frida_server_path)
+    download_with_cache_file(frida_download_url + frida_server, frida_server_path)
     files_dir = PATH_BUILD_TMP.joinpath("files")
     files_dir.mkdir(exist_ok=True)
     extract_file(frida_server_path, files_dir.joinpath(f"frida-server-{arch}"))
@@ -109,19 +108,12 @@ def do_build(frida_tag: str, project_tag: str):
     PATH_DOWNLOADS.mkdir(parents=True, exist_ok=True)
     PATH_BUILD.mkdir(parents=True, exist_ok=True)
 
-    create_module(project_tag)
+    copy_template_to_build(project_tag)
+    gen_module_prop_file(PATH_BUILD_TMP, project_tag)
 
     # archs = ["arm", "arm64", "x86", "x86_64"]
     archs = ["arm64"]
-
-    executor = concurrent.futures.ProcessPoolExecutor()
-    futures = [executor.submit(fill_module, arch, frida_tag, project_tag)
-               for arch in archs]
-    for future in concurrent.futures.as_completed(futures):
-        if future.exception() is not None:
-            raise future.exception()
-    # executor.shutdown()
-
+    [fill_so_module(arch, frida_tag) for arch in archs]
     package_module(frida_tag)
 
     logger.info("Done")
