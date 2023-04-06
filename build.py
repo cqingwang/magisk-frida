@@ -27,12 +27,13 @@ logger.addHandler(syslog)
 
 def download_file(url: str, path: Path):
     file_name = url[url.rfind("/") + 1:]
+    logger.info(f"file:{file_name} ,path:'{url}'")
     logger.info(f"Downloading '{file_name}' to '{path}'")
 
     if path.exists():
         return
 
-    r = requests.get(url, allow_redirects=True,headers=config.auth_headers)
+    r = requests.get(url, allow_redirects=True, headers=config.auth_headers)
     with open(path, "wb") as f:
         f.write(r.content)
 
@@ -110,7 +111,9 @@ def do_build(frida_tag: str, project_tag: str):
 
     create_module(project_tag)
 
-    archs = [ "arm64", "x86_64"]
+    # archs = ["arm", "arm64", "x86", "x86_64"]
+    archs = ["arm64"]
+
     executor = concurrent.futures.ProcessPoolExecutor()
     futures = [executor.submit(fill_module, arch, frida_tag, project_tag)
                for arch in archs]

@@ -16,29 +16,16 @@
 #
 
 import build
+import config
 import util
 
 
 def main():
-    last_frida_tag = util.get_last_frida_tag()
-    last_project_tag = util.get_last_project_tag()
-    last_commit_tag = util.get_last_commit_tag()
-    new_project_tag = "0"
+    latest_version = util.get_target_frida_tag()
+    build.do_build(latest_version, '0')
 
-    if last_frida_tag != util.strip_revision(last_project_tag) \
-        or (last_frida_tag != util.strip_revision(last_commit_tag)
-            and util.get_commit_message().lower() == "release"):
-
-        new_project_tag = util.get_next_revision(last_frida_tag)
-        print(f"Update needed to {new_project_tag}")
-
-        # for use by deployment
-        with open("NEW_TAG.txt", "w") as the_file:
-            the_file.write(new_project_tag)
-    else:
-        print("All good!")
-
-    build.do_build(last_frida_tag, new_project_tag)
+    for target_version in config.target_versions:
+        build.do_build(target_version, '0')
 
 
 if __name__ == "__main__":
