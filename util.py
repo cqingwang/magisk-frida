@@ -1,18 +1,27 @@
 import re
 import requests
 import subprocess
-import auth
+import config
+
 
 # 12.7.5-2, 12.7.5-3, ... -> 12.7.5
 def strip_revision(tag) -> str:
     return tag.split('-', 1)[0]
 
 
+def release_by( versions):
+    for v in versions:
+        if v["tag_name"] == config.target_version:
+            return v
+    return versions[0]
+
+
 # gets last tag of GitHub project
 def get_last_github_tag(project_name) -> str:
     # releases_url = f"https://api.github.com/repos/{project_name}/releases/latest"
     releases_url = f"https://api.github.com/repos/{project_name}/releases"
-    releases = requests.get(releases_url,headers=auth.auth_headers).json()[0]
+    all_releases = requests.get(releases_url, headers=config.auth_headers).json()
+    releases = release_by(all_releases)
     # TODO: don't assume order
     last_release = releases["tag_name"]
     return last_release

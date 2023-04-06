@@ -9,7 +9,7 @@ import zipfile
 import concurrent.futures
 
 import requests
-import auth
+import config
 
 PATH_BASE = Path(__file__).parent.resolve()
 PATH_BASE_MODULE: Path = PATH_BASE.joinpath("base")
@@ -32,7 +32,7 @@ def download_file(url: str, path: Path):
     if path.exists():
         return
 
-    r = requests.get(url, allow_redirects=True,headers=auth.auth_headers)
+    r = requests.get(url, allow_redirects=True,headers=config.auth_headers)
     with open(path, "wb") as f:
         f.write(r.content)
 
