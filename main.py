@@ -22,10 +22,10 @@ import util
 
 def main():
     latest_version = util.get_target_frida_tag()
-    build.do_build(latest_version, '0')
+    build.do_build(latest_version, latest_version)
 
     for target_version in config.target_versions:
-        build.do_build(target_version, '0')
+        build.do_build(target_version, latest_version)
 
 
 if __name__ == "__main__":

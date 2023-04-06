@@ -120,7 +120,6 @@ def do_build(frida_tag: str, project_tag: str):
     for future in concurrent.futures.as_completed(futures):
         if future.exception() is not None:
             raise future.exception()
-    # TODO: Causes 'OSError: The handle is invalid' in Python 3.7, revert after update
     # executor.shutdown()
 
     package_module(frida_tag)
